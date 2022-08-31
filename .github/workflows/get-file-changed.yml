@@ -47,11 +47,11 @@ jobs:
             done
             uniquesPages=($(for v in "${pages[@]}"; do echo "$v";done| sort| uniq| xargs))
             echo "unique pages are ${uniquesPages[@]}"
-            Write-Host "##vso[task.setvariable variable=pages]$uniquesPages"
+            echo '::set-output name=pages::$uniquesPages'
       - name: Got Pages changed
         run: |
             echo "pages:${pages}"
-            echo "taskpage ${{steps.filtered}}"
+            echo "taskpage ${{steps.filtered.outputs.pages}}"
             echo " hello  $(pages)"
 
 #       steps:
