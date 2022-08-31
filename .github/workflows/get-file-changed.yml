@@ -26,18 +26,6 @@ jobs:
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
             echo "$file was changed"
           done
-
-      - name: Get changed files in json
-        id: changed-files-json
-        uses: tj-actions/changed-files@v29.0.2
-        with:
-          json: "true"
-
-      - name: List all changed files
-        run: |
-          for output in ${{ steps.changed-files-json.outputs }}; do
-            echo "$output was changed"
-          done
 #       steps:
 #       - uses: actions/checkout@v3
 #         with:
