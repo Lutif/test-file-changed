@@ -33,6 +33,7 @@ jobs:
 
       - name: Get Dir from src only
         run: |
+            pages=()
             for dir in ${{ steps.changed-files.outputs.all_changed_files }}; do
               if [[ $dir == *"src/"* ]]; then
                 echo "It's there!: $dir"
