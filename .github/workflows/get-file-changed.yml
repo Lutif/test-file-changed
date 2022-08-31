@@ -51,7 +51,7 @@ jobs:
       - name: Got Pages changed
         run: |
             echo "pages:${pages}"
-            echo "task.page ${steps.filtered}"
+            echo "taskpage ${steps.filtered}"
             echo " ${{steps.filtered}}  $(pages)"
 
 #       steps:
