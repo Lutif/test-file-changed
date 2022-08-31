@@ -44,7 +44,8 @@ jobs:
                 pages+=($page)
               fi
             done
-
+            uniquesPages=($(for v in "${pages[@]}"; do echo "$v";done| sort| uniq| xargs))
+            echo "unique pages are ${uniquesPages[@]}"
 #       steps:
 #       - uses: actions/checkout@v3
 #         with:
