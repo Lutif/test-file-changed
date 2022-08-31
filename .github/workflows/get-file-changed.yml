@@ -37,7 +37,7 @@ jobs:
                 echo "It's there!: $dir"
                 pagefulldir=${dir##*"src/"}
                 echo "pagefulldir: $pagefulldir"
-                page==\${pagefulldir##*/}
+                page==${pagefulldir##*/}
                 echo "page: $page"
               fi
             done
