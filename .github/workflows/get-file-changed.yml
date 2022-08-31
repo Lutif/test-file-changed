@@ -30,9 +30,10 @@ jobs:
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
             echo "$file was changed"
           done
+
       - name: Get Dir from src only
         run: |
-            pages=()
+#            pages=()
             for dir in ${{ steps.changed-files.outputs.all_changed_files }}; do
               if [[ $dir == *"src/"* ]]; then
                 echo "It's there!: $dir"
@@ -45,8 +46,8 @@ jobs:
                 pages+=($page)
               fi
             done
-              uniquesPages=($(for v in "${pages[@]}"; do echo "$v";done| sort| uniq| xargs))
-              echo "unique pages are ${uniquesPages[@]}"
+              # uniquesPages=($(for v in "${pages[@]}"; do echo "$v";done| sort| uniq| xargs))
+              # echo "unique pages are ${uniquesPages[@]}"
 #       steps:
 #       - uses: actions/checkout@v3
 #         with:
