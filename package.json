@@ -1,0 +1,23 @@
+{
+  "name": "test-file-changed",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lutif/test-file-changed.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Lutif/test-file-changed/issues"
+  },
+  "homepage": "https://github.com/Lutif/test-file-changed#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "jest": "^29.0.1"
+  }
+}
