@@ -22,6 +22,8 @@ jobs:
         uses: tj-actions/changed-files@v29.0.2
         with:
           dir_names: "true"
+          fetch-depth: 0
+
 
       - name: List all changed files
         run: |
@@ -35,7 +37,7 @@ jobs:
                 echo "It's there!: $dir"
                 pagefulldir=${dir##*"src/"}
                 echo "pagefulldir: $pagefulldir"
-                page==${pagefulldir##*/}
+                page==\${pagefulldir##*/}
                 echo "page: $page"
               fi
             done
