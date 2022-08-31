@@ -21,6 +21,7 @@ jobs:
         uses: tj-actions/changed-files@v29.0.2
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - name: List all added files
-        run: for file in ${{ steps.changed-files.outputs.added_files }}; do
+        run: for file in ${{ steps.changed-files.outputs.added_files }}; |
+          do
             echo "$file was added"
           done
