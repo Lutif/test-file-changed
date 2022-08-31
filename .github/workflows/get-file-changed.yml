@@ -3,10 +3,10 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -16,12 +16,218 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0  # OR "2" -> To retrieve the preceding commit.
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v29.0.2
+
+      - name: List all changed files
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "$file was changed"
+          done
+...
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # OR "2" -> To retrieve the preceding commit.
+#          submodules: true # OR "recursive" -> To include all changed submodule files.
+
       - name: Get changed files using defaults
         id: changed-files
         uses: tj-actions/changed-files@v29.0.2
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+
+      - name: Get changed files using a comma separator
+        id: changed-files-comma
+        uses: tj-actions/changed-files@v29.0.2
+        with:
+          separator: ","
+
       - name: List all added files
-        run: for file in ${{ steps.changed-files.outputs.added_files }}; |
-          do
+        run: |
+          for file in ${{ steps.changed-files.outputs.added_files }}; do
             echo "$file was added"
           done
+
+      - name: Run step when a file changes
+        if: contains(steps.changed-files.outputs.modified_files, 'my-file.txt')
+        run: |
+          echo "Your my-file.txt file has been modified."
+
+      - name: Run step when a file has been deleted
+        if: contains(steps.changed-files.outputs.deleted_files, 'test.txt')
+        run: |
+          echo "Your test.txt file has been deleted."
+
+      - name: Get specific changed files
+        id: changed-files-specific
+        uses: tj-actions/changed-files@v29.0.2
+        with:
+          files: |
+            my-file.txt
+            test.txt
+            new.txt
+            test_directory
+            *.sh
+            *.png
+            !*.md
+            *.jpeg
+            **/migrate-*.sql
+          files_ignore: |
+            *.yml
+
+      - name: Run step if any of the listed files above change
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        run: |
+          echo "One or more files listed above has changed."
+
+      - name: Run step if only the files listed above change
+        if: steps.changed-files-specific.outputs.only_changed == 'true'
+        run: |
+          echo "Only files listed above have changed."
+
+      - name: Run step if any of the listed files above is deleted
+        if: steps.changed-files.outputs.any_deleted == 'true'
+        run: |
+          for file in ${{ steps.changed-files.outputs.deleted_files }}; do
+            echo "$file was deleted"
+          done
+
+      - name: Run step if all listed files above have been deleted
+        if: steps.changed-files.outputs.only_deleted == 'true'
+        run: |
+          for file in ${{ steps.changed-files.outputs.deleted_files }}; do
+            echo "$file was deleted"
+          done
+
+      - name: Use a source file or list of file(s) to populate to files input.
+        id: changed-files-specific-source-file
+        uses: tj-actions/changed-files@v29.0.2
+        with:
+          files_from_source_file: |
+            test/changed-files-list.txt
+
+      - name: Use a source file or list of file(s) to populate to files input and optionally specify more files.
+        id: changed-files-specific-source-file-and-specify-files
+        uses: tj-actions/changed-files@v29.0.2
+        with:
+          files_from_source_file: |
+            test/changed-files-list.txt
+          files: |
+            test.txt
+
+      - name: Use a different commit SHA
+        id: changed-files-custom-sha
+        uses: tj-actions/changed-files@v29.0.2
+        with:
+          sha: ${{ github.event.pull_request.head.sha }}
+
+      - name: Use a different base SHA
+        id: changed-files-custom-base-sha
+        uses: tj-actions/changed-files@v29.0.2
+        with:
+          base_sha: ${{ github.event.pull_request.base.sha }}
+          
+      - name: Checkout into dir1
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          path: dir1
+
+      - name: Run changed-files with defaults on the dir1
+        id: changed-files-for-dir1
+        uses: tj-actions/changed-files@v29.0.2
+        with:
+          path: dir1
+
+      - name: List all added files in dir1
+        run: |
+          for file in ${{ steps.changed-files-for-dir1.outputs.added_files }}; do
+            echo "$file was added"
+          done
+
+      - name: Run changed-files using the last commit on the remote branch
+        id: changed-files-since-last-remote-commit
+        uses: tj-actions/changed-files@v29.0.2
+        with:
+          since_last_remote_commit: "true"
+      
+      - name: Run changed-files using the fork point of a pull request
+        id: changed-files-fork-point
+        uses: tj-actions/changed-files@v29.0.2
+        with:
+          use_fork_point: "true"
+          
+      - name: Run changed-files with quotepath disabled
+        id: changed-files-quotepath
+        uses: tj-actions/changed-files@v29.0.2
+        with:
+          quotepath: "false"
+      
+      # Run changed-files action using the last successful commit as the base_sha
+      # NOTE: This setting overrides the commit sha used by setting since_last_remote_commit to true.
+      # It is recommended to use either solution that works for your use case.
+      
+      # Push event based workflows
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v5
+
+      - uses: nrwl/last-successful-commit-action@v1
+        id: last_successful_commit_push
+        with:
+          branch: ${{ steps.branch-name.outputs.current_branch }} # Get the last successful commit for the current branch. 
+          workflow_id: 'test.yml'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run changed-files with the commit of the last successful test workflow run
+        id: changed-files-base-sha-push
+        uses: tj-actions/changed-files@v29.0.2
+        with:
+          base_sha: ${{ steps.last_successful_commit_push.outputs.commit_hash }}
+
+      # Pull request based workflows.
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v5
+        if: github.event_name == 'pull_request'
+
+      - uses: nrwl/last-successful-commit-action@v1
+        id: last_successful_commit_pull_request
+        if: github.event_name == 'pull_request'
+        with:
+          branch: ${{ steps.branch-name.outputs.base_ref_branch }} # Get the last successful commit on master or main branch 
+          workflow_id: 'test.yml'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run changed-files with the commit of the last successful test workflow run on main
+        if: github.event_name == 'pull_request'
+        id: changed-files-base-sha-pull-request
+        uses: tj-actions/changed-files@v29.0.2
+        with:
+          base_sha: ${{ steps.last_successful_commit_pull_request.outputs.commit_hash }}
+
+      - name: Run changed-files with dir_names
+        id: changed-files-dir-names
+        uses: tj-actions/changed-files@v29.0.2
+        with:
+          dir_names: "true"
+      
+      # All outputs are JSON formatted arrays and can be used in other actions and matrix compatible jobs.
+      - name: Run changed-files with json output
+        id: changed-files-json
+        uses: tj-actions/changed-files@v29.0.2
+        with:
+          json: "true"
+
+      - name: Run changed-files since 2022-08-19
+        id: changed-files-since
+        uses: tj-actions/changed-files@v29.0.2
+        with:
+          since: "2022-08-19"
+
+      - name: Run changed-files until 2022-08-20
+        id: changed-files-until
+        uses: tj-actions/changed-files@v29.0.2
+        with:
+          until: "2022-08-20"
