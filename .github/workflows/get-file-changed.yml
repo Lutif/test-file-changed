@@ -51,8 +51,8 @@ jobs:
       - name: Got Pages changed
         run: |
             echo "pages:${pages}"
-            echo "taskpage ${steps.filtered}"
-            echo " ${{steps.filtered}}  $(pages)"
+            echo "taskpage ${{steps.filtered}}"
+            echo "   $(pages)"
 
 #       steps:
 #       - uses: actions/checkout@v3
