@@ -28,6 +28,14 @@ jobs:
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
             echo "$file was changed"
           done
+      - name: Get Dir from src only
+        run: |
+            for dir in ${{ steps.changed-files.outputs.all_changed_files }}; do
+              if [[ $dir == *"src/"* ]]; then
+                echo "It's there!: $dir"
+              fi
+            done
+
 #       steps:
 #       - uses: actions/checkout@v3
 #         with:
