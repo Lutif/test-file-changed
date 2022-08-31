@@ -51,8 +51,10 @@ jobs:
       - name: Got Pages changed
         run: |
             echo "pages:${pages}"
-            echo "taskpage ${{steps.filtered.outputs.pages}}"
-            echo " hello  $(pages)"
+            for page in ${{ steps.filtered-files.outputs.pages }}; do
+              echo "page:${page}"
+            done
+
 
 #       steps:
 #       - uses: actions/checkout@v3
