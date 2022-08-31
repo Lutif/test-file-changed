@@ -33,9 +33,9 @@ jobs:
             for dir in ${{ steps.changed-files.outputs.all_changed_files }}; do
               if [[ $dir == *"src/"* ]]; then
                 echo "It's there!: $dir"
-                pagefulldir=$(echo $dir| cut -d'"src/"' -f 2)
+                pagefulldir=${dir##*"src/"}
                 echo "pagefulldir: $pagefulldir"
-                page==$(echo $pagefulldir| cut -d'"/"' -f 1) 
+                page==${pagefulldir##*/}
                 echo "page: $page"
               fi
             done
