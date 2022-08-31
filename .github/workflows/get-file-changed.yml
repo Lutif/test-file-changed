@@ -32,6 +32,7 @@ jobs:
           done
 
       - name: Get Dir from src only
+        id: filtered
         run: |
             pages=()
             for dir in ${{ steps.changed-files.outputs.all_changed_files }}; do
@@ -46,6 +47,11 @@ jobs:
             done
             uniquesPages=($(for v in "${pages[@]}"; do echo "$v";done| sort| uniq| xargs))
             echo "unique pages are ${uniquesPages[@]}"
+            echo "##vso[task.setvariable variable=pages;isOutput=true]$pages"
+      - name: Got Pages changed
+        run: |
+            echo "pages:${pages} task.page ${steps.filtered} ${{steps.filtered}}  $(pages)"
+
 #       steps:
 #       - uses: actions/checkout@v3
 #         with:
